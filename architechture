@@ -1,0 +1,2 @@
+user requests -> middleware intercepts and logs (save it in node local) -> function works -> response 
+-> onFinish(statusCode, id, message, startTime, totalTime) flushed to MongoDB -> return res to user
