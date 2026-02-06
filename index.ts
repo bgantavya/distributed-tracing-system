@@ -1,14 +1,12 @@
 'use strict'
 import express from "express";
-import type { NextFunction, Request, Response } from "express";
 import { loadDo, loadStats, loadUser } from "./src/loaders";
-import { andRestrictTo, andRestrictToSelf, authenticate, notFound } from "./src/restrict";
+import { andRestrictTo, andRestrictToSelf, authenticate } from "./src/restrict";
 import { traceRequest } from "./src/tracer";
-import { deleteUser, editUser, showDelay, showLogs, showStatus, showUser } from "./src/views";
+import { deleteUser, editUser, notFound, showDelay, showLogs, showStatus, showUser } from "./src/views";
 import { RoleTypes } from "./utils/enums";
 import { Paths } from "./utils/constant";
 import { AppError } from "./utils/errors";
-import { requestLogger } from "./src/middleware";
 import { loadEnvFile } from "process";
 
 export const app = express();
@@ -48,7 +46,7 @@ app.get(Paths.logs.base(), loadStats, showLogs);
 app.get(Paths.logs.filtered(), loadStats, showLogs);
 app.use(notFound);
 
-app.use(function(err: Error, req: Request, res: Response, next: NextFunction) {
+app.use(({err, req, res, next}: any) => {
   const appError = err instanceof AppError ? err : new AppError(err.message || "Server error");
   res.status(appError.statusCode).json({
     error: {
