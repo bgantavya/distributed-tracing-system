@@ -1,10 +1,10 @@
 'use strict'
-
 /**
  * Module dependencies.
  */
 
-var express = require('express');
+import express from "express";
+import { env } from "node:process";
 
 var app = express();
 
@@ -15,12 +15,10 @@ var app = express();
 //     curl http://localhost:3000/user/1/edit (unauthorized since this is not you)
 //     curl -X DELETE http://localhost:3000/user/0 (unauthorized since you are not an admin)
 
-// Dummy users
-var users = [
-  { id: 0, name: 'tj', email: 'tj@vision-media.ca', role: 'member' }
-  , { id: 1, name: 'ciaran', email: 'ciaranj@gmail.com', role: 'member' }
-  , { id: 2, name: 'aaron', email: 'aaron.heckmann+github@gmail.com', role: 'admin' }
-];
+
+
+// Intercepter middleware 
+
 
 function loadUser(req, res, next) {
   // You would fetch your user from the db
@@ -62,6 +60,8 @@ function andRestrictTo(role) {
 // but this illustrates how an authenticated user
 // may interact with middleware
 
+// const loadTime = ()
+
 app.use(function(req, res, next){
   req.authenticatedUser = users[0];
   next();
@@ -82,9 +82,20 @@ app.get('/user/:id/edit', loadUser, andRestrictToSelf, function(req, res){
 app.delete('/user/:id', loadUser, andRestrictTo('admin'), function(req, res){
   res.send('Deleted user ' + req.user.name);
 });
+// app.all('/*', (req, res) => res.send('Page not found at endpoint'))
 
+// app.get('/delay/:t', loadTime, (req, res) =>{
+//     res.send('Response delayed by seconds: ' + req.);
+
+// })
+
+app.use(function(req, res, next){
+  res.send('Nothings here')
+});
 /* istanbul ignore next */
-if (!module.parent) {
-  app.listen(3000);
-  console.log('Express started on port 3000');
-}
+// if (!module.parent) {
+//   app.listen(3000);
+//   console.log('Express started on port 3000');
+// }
+
+app.listen(1234, ()=> console.log('Server running at: ' + 1234))

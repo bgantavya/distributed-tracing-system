@@ -23,16 +23,23 @@
     "type": "git",
     "url": "git+https://github.com/bgantavya/distributed-tracing-system.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "Gantavya Bansal",
-  "type": "commonjs",
-  "main": "index.js",
+  "type": "module",
+  "main": "index.ts",
   "scripts": {
-    "serve": "node index.js",
-    "test": "nodemon index.js"
+    "serve": "node index.ts",
+    "test": "nodemon index.ts"
   },
   "dependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.2.1",
+    "dotenv": "^17.2.4",
     "express": "^5.2.1",
-    "nodemon": "^3.1.11"
+    "javascript": "^1.0.0",
+    "node": "^25.6.0",
+    "nodemon": "^3.1.11",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
