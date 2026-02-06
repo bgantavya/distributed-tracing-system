@@ -1,13 +1,18 @@
 'use strict'
-/**
- * Module dependencies.
- */
-
 import express from "express";
-import { env } from "node:process";
+import type { NextFunction, Request, Response } from "express";
+import { loadDo, loadStats, loadUser } from "./src/loaders";
+import { andRestrictTo, andRestrictToSelf, authenticate, notFound } from "./src/restrict";
+import { traceRequest } from "./src/tracer";
+import { deleteUser, editUser, showDelay, showLogs, showStatus, showUser } from "./src/views";
+import { RoleTypes } from "./utils/enums";
+import { Paths } from "./utils/constant";
+import { AppError } from "./utils/errors";
+import { requestLogger } from "./src/middleware";
+import { loadEnvFile } from "process";
 
-var app = express();
-
+export const app = express();
+loadEnvFile()
 // Example requests:
 //     curl http://localhost:3000/user/0
 //     curl http://localhost:3000/user/0/edit
@@ -17,85 +22,43 @@ var app = express();
 
 
 
-// Intercepter middleware 
-
-
-function loadUser(req, res, next) {
-  // You would fetch your user from the db
-  var user = users[req.params.id];
-  if (user) {
-    req.user = user;
-    next();
-  } else {
-    next(new Error('Failed to load user ' + req.params.id));
-  }
-}
-
-function andRestrictToSelf(req, res, next) {
-  // If our authenticated user is the user we are viewing
-  // then everything is fine :)
-  if (req.authenticatedUser.id === req.user.id) {
-    next();
-  } else {
-    // You may want to implement specific exceptions
-    // such as UnauthorizedError or similar so that you
-    // can handle these can be special-cased in an error handler
-    // (view ./examples/pages for this)
-    next(new Error('Unauthorized'));
-  }
-}
-
-function andRestrictTo(role) {
-  return function(req, res, next) {
-    if (req.authenticatedUser.role === role) {
-      next();
-    } else {
-      next(new Error('Unauthorized'));
-    }
-  }
-}
-
-// Middleware for faux authentication
-// you would of course implement something real,
-// but this illustrates how an authenticated user
-// may interact with middleware
-
-// const loadTime = ()
-
-app.use(function(req, res, next){
-  req.authenticatedUser = users[0];
-  next();
-});
+// Interceptor middleware
+// app.use(express.json({ limit: config.bodyLimit }));
+// app.use(securityHeaders);
+// app.use(rateLimiter);
+app.use(traceRequest);
+// app.use(requestLogger);
+app.use(authenticate);
 
 app.get('/', function(req, res){
   res.redirect('/user/0');
 });
 
-app.get('/user/:id', loadUser, function(req, res){
-  res.send('Viewing user ' + req.user.name);
+app.get(Paths.user.base(), loadUser, showUser);
+app.get(Paths.user.edit(), loadUser, andRestrictToSelf, editUser);
+app.delete(Paths.user.base(), loadUser, andRestrictTo(RoleTypes.Admin), deleteUser);
+
+app.get('/delay/:t', loadDo, showDelay);
+app.get(Paths.status.code(), showStatus);
+app.get(Paths.status.base(), function(req, res){
+  res.redirect('/status/200');
 });
 
-app.get('/user/:id/edit', loadUser, andRestrictToSelf, function(req, res){
-  res.send('Editing user ' + req.user.name);
+app.get(Paths.logs.base(), loadStats, showLogs);
+app.get(Paths.logs.filtered(), loadStats, showLogs);
+app.use(notFound);
+
+app.use(function(err: Error, req: Request, res: Response, next: NextFunction) {
+  const appError = err instanceof AppError ? err : new AppError(err.message || "Server error");
+  res.status(appError.statusCode).json({
+    error: {
+      message: appError.message,
+      code: appError.code,
+      traceId: req.traceId ?? undefined,
+    },
+  });
 });
 
-app.delete('/user/:id', loadUser, andRestrictTo('admin'), function(req, res){
-  res.send('Deleted user ' + req.user.name);
-});
-// app.all('/*', (req, res) => res.send('Page not found at endpoint'))
-
-// app.get('/delay/:t', loadTime, (req, res) =>{
-//     res.send('Response delayed by seconds: ' + req.);
-
-// })
-
-app.use(function(req, res, next){
-  res.send('Nothings here')
-});
-/* istanbul ignore next */
-// if (!module.parent) {
-//   app.listen(3000);
-//   console.log('Express started on port 3000');
-// }
-
-app.listen(1234, ()=> console.log('Server running at: ' + 1234))
+if (process.env.NODE_ENV !== "test") {
+  app.listen(process.env.PORT, () => console.log('Server running at: ' + process.env.PORT));
+}

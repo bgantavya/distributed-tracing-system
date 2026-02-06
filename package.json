@@ -28,8 +28,8 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "serve": "node index.ts",
-    "test": "nodemon index.ts"
+    "serve": "tsx index.ts",
+    "test": "tsx --test"
   },
   "dependencies": {
     "@types/express": "^5.0.6",
