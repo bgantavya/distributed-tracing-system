@@ -8,13 +8,32 @@ export type UserProps = {
     role: RoleTypes;
 };
 
+export type Trace = {
+    id: string;
+    method: string;
+    Paths: string;
+    statusCode: number;
+    startTime: number;
+    durationMs: number;
+    userId?: number;
+};
+
+export type AppRequest = Request & {
+    user?: UserProps;
+    authenticatedUser?: UserProps;
+    traceId?: string;
+    startTime?: number;
+    delaySeconds?: number;
+    traces?: Trace[];
+};
+
 export type ExpProps = {
-    req: Request;
+    req: AppRequest;
     res: Response;
     next: NextFunction;
 } 
 export type ViewProps = {
-    req: Request,
+    req: AppRequest,
     res: Response,
 } 
 
@@ -25,6 +44,10 @@ declare global {
         interface Request {
             user?: UserProps;
             authenticatedUser?: UserProps;
+            traceId?: string;
+            startTime?: number;
+            delaySeconds?: number;
+            traces?: Trace[];
         }
     }
 }
