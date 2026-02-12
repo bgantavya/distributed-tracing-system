@@ -1,9 +1,10 @@
-import type { ExpProps } from "../utils/types";
-import { users } from "../utils/users";
-import { AppError } from "../utils/errors";
-import { getTraces } from "./db";
+import type { AppRequest } from "./utils/types";
+import type { NextFunction, Response } from "express";
+import { users } from "./utils/users";
+import { AppError } from "./utils/errors";
+import { getTraces } from "./Tracer/store";
 
-export const loadUser = ({ req, res, next }: ExpProps) => {
+export const loadUser = (req: AppRequest, res: Response, next: NextFunction) => {
     const raw = req.params.id;
     const id = Number(raw);
 
@@ -21,7 +22,7 @@ export const loadUser = ({ req, res, next }: ExpProps) => {
     }
 };
 
-export const loadDo = ({ req, res, next }: ExpProps) => {
+export const loadDo = (req: AppRequest, res: Response, next: NextFunction) => {
     const raw = req.params.t;
     const seconds = Number(raw);
 
@@ -33,7 +34,7 @@ export const loadDo = ({ req, res, next }: ExpProps) => {
     setTimeout(() => next(), seconds * 1000);
 };
 
-export const loadStats = ({ req, res, next }: ExpProps) => {
+export const loadStats = (req: AppRequest, res: Response, next: NextFunction) => {
     req.traces = getTraces();
     next();
 };

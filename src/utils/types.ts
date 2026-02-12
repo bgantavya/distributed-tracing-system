@@ -1,5 +1,5 @@
-import type { NextFunction, Request } from "express";
-import { RoleTypes } from "./enums";
+import type { Request } from "express";
+import { RoleTypes } from "./constant";
 
 export type UserProps = {
     id: number;
@@ -11,7 +11,7 @@ export type UserProps = {
 export type Trace = {
     id: string;
     method: string;
-    Paths: string;
+    path: string;
     statusCode: number;
     startTime: number;
     durationMs: number;
@@ -26,18 +26,6 @@ export type AppRequest = Request & {
     delaySeconds?: number;
     traces?: Trace[];
 };
-
-export type ExpProps = {
-    req: AppRequest;
-    res: Response;
-    next: NextFunction;
-} 
-export type ViewProps = {
-    req: AppRequest,
-    res: Response,
-} 
-
-
 
 declare global {
     namespace Express {

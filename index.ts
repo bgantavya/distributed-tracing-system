@@ -1,16 +1,18 @@
 'use strict'
 import express from "express";
+import dotenv from "dotenv";
+import type { NextFunction, Request, Response } from "express";
 import { loadDo, loadStats, loadUser } from "./src/loaders";
 import { andRestrictTo, andRestrictToSelf, authenticate } from "./src/restrict";
-import { traceRequest } from "./src/tracer";
+import { traceRequest } from "./src/Tracer/tracer";
 import { deleteUser, editUser, notFound, showDelay, showLogs, showStatus, showUser } from "./src/views";
-import { RoleTypes } from "./utils/enums";
-import { Paths } from "./utils/constant";
-import { AppError } from "./utils/errors";
-import { loadEnvFile } from "process";
+import { RoleTypes } from "./src/utils/constant";
+import { Paths, ServeTypes } from "./src/utils/constant";
+import { AppError } from "./src/utils/errors";
+
+dotenv.config();
 
 export const app = express();
-loadEnvFile()
 // Example requests:
 //     curl http://localhost:3000/user/0
 //     curl http://localhost:3000/user/0/edit
@@ -21,32 +23,25 @@ loadEnvFile()
 
 
 // Interceptor middleware
-// app.use(express.json({ limit: config.bodyLimit }));
-// app.use(securityHeaders);
-// app.use(rateLimiter);
+app.use(express.json({ limit: "1mb" }));
 app.use(traceRequest);
-// app.use(requestLogger);
 app.use(authenticate);
 
-app.get('/', function(req, res){
-  res.redirect('/user/0');
-});
+app.get('/', (req, res) => res.redirect('/user/0'));
 
 app.get(Paths.user.base(), loadUser, showUser);
 app.get(Paths.user.edit(), loadUser, andRestrictToSelf, editUser);
 app.delete(Paths.user.base(), loadUser, andRestrictTo(RoleTypes.Admin), deleteUser);
 
-app.get('/delay/:t', loadDo, showDelay);
-app.get(Paths.status.code(), showStatus);
-app.get(Paths.status.base(), function(req, res){
-  res.redirect('/status/200');
-});
+app.get(Paths.delay(), loadDo, showDelay);
+app.get(Paths.status(), showStatus);
 
 app.get(Paths.logs.base(), loadStats, showLogs);
 app.get(Paths.logs.filtered(), loadStats, showLogs);
 app.use(notFound);
 
-app.use(({err, req, res, next}: any) => {
+
+app.use(function(err: Error, req: Request, res: Response, next: NextFunction) {
   const appError = err instanceof AppError ? err : new AppError(err.message || "Server error");
   res.status(appError.statusCode).json({
     error: {
@@ -57,6 +52,7 @@ app.use(({err, req, res, next}: any) => {
   });
 });
 
+const port = Number(process.env.PORT) || 1234;
 if (process.env.NODE_ENV !== "test") {
-  app.listen(process.env.PORT, () => console.log('Server running at: ' + process.env.PORT));
+  app.listen(port, () => console.log('Server running at: ' + port));
 }
