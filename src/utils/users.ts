@@ -1,4 +1,4 @@
-import { RoleTypes } from "./enums";
+import { RoleTypes } from "./constant";
 import type { UserProps } from "./types";
 
 export const users: UserProps[] = [

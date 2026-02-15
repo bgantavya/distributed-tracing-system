@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { AppRequest } from "../utils/types";
 import type { NextFunction, Response } from "express";
-import { addTrace } from "./db";
+import { addTrace } from "../Tracer/store";
 
 export const traceRequest = (req: AppRequest, res: Response, next: NextFunction) => {
 	const startTime = Date.now();
@@ -15,7 +15,7 @@ export const traceRequest = (req: AppRequest, res: Response, next: NextFunction)
 		addTrace({
 			id: traceId,
 			method: req.method,
-			Paths: req.originalUrl,
+			path: req.originalUrl,
 			statusCode: res.statusCode,
 			startTime,
 			durationMs,

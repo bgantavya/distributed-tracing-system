@@ -1,7 +1,7 @@
-import type { AppRequest, ViewProps } from "../utils/types";
+import type { AppRequest } from "./utils/types";
 import type { Response } from "express";
 
-export const showLogs = ({ req, res }: ViewProps) => {
+export const showLogs = (req: AppRequest, res: Response) => {
     const traces = req.traces ?? [];
     const raw = req.params.code;
     const statusCode = raw ? Number(raw) : undefined;
@@ -19,38 +19,38 @@ export const showLogs = ({ req, res }: ViewProps) => {
     res.json({ traces });
 };
 
-export const showUser = ({ req, res }: ViewProps) => {
+export const showUser = (req: AppRequest, res: Response) => {
     const user = req.user;
     if (!user) {
         res.status(404).send('User not found');
         return;
     }
-    res.send(`Viewing user  + ${user.name}`);
-}
+    res.send(`Viewing user ${user.name}`);
+};
 
-export const editUser = ({ req, res }: ViewProps) => {
+export const editUser = (req: AppRequest, res: Response) => {
     const user = req.user;
     if (!user) {
         res.status(404).send('User not found');
         return;
     }
     res.send('Editing user ' + user.name);
-}
+};
 
-export const deleteUser = ({ req, res }: ViewProps) => {
+export const deleteUser = (req: AppRequest, res: Response) => {
     const user = req.user;
     if (!user) {
         res.status(404).send('User not found');
         return;
     }
     res.send('Deleted user ' + user.name);
-}
+};
 
-export const showDelay = ({ req, res }: ViewProps) => {
+export const showDelay = (req: AppRequest, res: Response) => {
     res.send('Response delayed by seconds: ' + req.delaySeconds);
-}
+};
 
-export const showStatus = ({ req, res }: ViewProps) => {
+export const showStatus = (req: AppRequest, res: Response) => {
     const raw = req.params.code;
     const code = Number(raw);
 
@@ -67,6 +67,6 @@ export const showStatus = ({ req, res }: ViewProps) => {
     res.status(code).send('Status set to ' + code);
 };
 
-export const notFound = ({ req, res }: ViewProps) => {
+export const notFound = (req: AppRequest, res: Response) => {
     res.status(404).send('Nothing here')
 };
