@@ -1,7 +1,7 @@
-import type { AppRequest } from "./utils/types";
-import type { NextFunction, Response } from "express";
-import { users } from "./utils/users";
-import { AppError } from "./utils/errors";
+import { AppRequest } from "./utils/types.js";
+import { NextFunction, Response } from "express";
+import { users } from "./utils/constant.js";
+import { AppError } from "./utils/errors.js";
 
 export const authenticate = (req: AppRequest, res: Response, next: NextFunction) => {
     req.authenticatedUser = users[0];

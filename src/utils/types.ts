@@ -1,11 +1,11 @@
 import type { Request } from "express";
-import { RoleTypes } from "./constant";
+import { Roles } from "./constant.js";
 
 export type UserProps = {
     id: number;
     name: string;
     email: string;
-    role: RoleTypes;
+    role: Roles;
 };
 
 export type Trace = {

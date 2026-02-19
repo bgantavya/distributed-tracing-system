@@ -1,5 +1,5 @@
-import type { AppRequest } from "./utils/types";
-import type { Response } from "express";
+import { AppRequest } from "./utils/types.js";
+import { Response } from "express";
 
 export const showLogs = (req: AppRequest, res: Response) => {
     const traces = req.traces ?? [];
