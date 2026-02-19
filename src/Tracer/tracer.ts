@@ -1,12 +1,11 @@
-import crypto from "node:crypto";
-import type { AppRequest } from "../utils/types";
+import {randomUUID} from "node:crypto";
+import { AppRequest } from "../utils/types.js";
 import type { NextFunction, Response } from "express";
-import { addTrace } from "../Tracer/store";
+import { addTrace } from "./store.js";
 
 export const traceRequest = (req: AppRequest, res: Response, next: NextFunction) => {
 	const startTime = Date.now();
-	const traceId = crypto.randomUUID();
-	req.traceId = traceId;
+	const traceId = randomUUID();
 	req.startTime = startTime;
 	res.setHeader("X-Trace-Id", traceId);
 

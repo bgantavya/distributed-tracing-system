@@ -1,8 +1,8 @@
-import type { AppRequest } from "./utils/types";
-import type { NextFunction, Response } from "express";
-import { users } from "./utils/users";
-import { AppError } from "./utils/errors";
-import { getTraces } from "./Tracer/store";
+import { AppRequest } from "./utils/types.js";
+import { NextFunction, Response } from "express";
+import { users } from "./utils/constant.js";
+import { AppError } from "./utils/errors.js";
+import { getTraces } from "./Tracer/store.js";
 
 export const loadUser = (req: AppRequest, res: Response, next: NextFunction) => {
     const raw = req.params.id;
@@ -15,6 +15,7 @@ export const loadUser = (req: AppRequest, res: Response, next: NextFunction) => 
 
     const user = users[id];
     if (user) {
+        console.log("user", user)
         req.user = user;
         next();
     } else {
