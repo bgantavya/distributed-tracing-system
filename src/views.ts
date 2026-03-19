@@ -1,8 +1,9 @@
+import { getTraces } from "./Tracer/store.js";
 import { AppRequest } from "./utils/types.js";
 import { Response } from "express";
 
-export const showLogs = (req: AppRequest, res: Response) => {
-    const traces = req.traces ?? [];
+export const showLogs = async (req: AppRequest, res: Response) => {
+    const traces = await getTraces();
     const raw = req.params.code;
     const statusCode = raw ? Number(raw) : undefined;
 

@@ -15,7 +15,6 @@ export const loadUser = (req: AppRequest, res: Response, next: NextFunction) => 
 
     const user = users[id];
     if (user) {
-        console.log("user", user)
         req.user = user;
         next();
     } else {
@@ -35,7 +34,17 @@ export const loadDo = (req: AppRequest, res: Response, next: NextFunction) => {
     setTimeout(() => next(), seconds * 1000);
 };
 
-export const loadStats = (req: AppRequest, res: Response, next: NextFunction) => {
-    req.traces = getTraces();
-    next();
+export const loadStats = async (req: AppRequest, res: Response, next: NextFunction) => {
+    try {
+        req.traces = await getTraces();
+        next();
+    } catch (error) {
+        next(new AppError("Unable to load traces", 500, "TRACE_LOAD_ERROR"));
+    }
 };
+
+export const loadTest = (req: AppRequest, res: Response, next: NextFunction) => {
+    const {url}: any  = req.query
+    fetch(url).then((data) => req.data = data).catch((err) => req.data = err).finally(() => next())
+    console.log(url)
+}
