@@ -16,15 +16,16 @@ export type Trace = {
     startTime: number;
     durationMs: number;
     userId?: number;
+    userAgent?: string;
+    ip?: string;
 };
 
 export type AppRequest = Request & {
     user?: UserProps;
     authenticatedUser?: UserProps;
-    traceId?: string;
     startTime?: number;
     delaySeconds?: number;
-    traces?: Trace[];
+    data?: unknown;
 };
 
 declare global {
@@ -32,10 +33,8 @@ declare global {
         interface Request {
             user?: UserProps;
             authenticatedUser?: UserProps;
-            traceId?: string;
             startTime?: number;
             delaySeconds?: number;
-            traces?: Trace[];
         }
     }
 }

@@ -1,12 +1,13 @@
 import { UserProps } from "./types.js";
 
 export const Paths = {
+    test: () => '/test',
+    delay: () => '/delay/:t',
+    status: () => '/status/:code',
     user: {
         base: () => '/user/:id',
         edit: () => '/user/:id/edit',
     },
-    status: () => '/status/:code',
-    delay: () => '/delay/:t',
     logs: {
         base: () => '/logs',
         filtered: () => '/logs/:code',
@@ -16,11 +17,6 @@ export const Paths = {
 export enum Roles {
 	Member = "member",
 	Admin = "admin",
-}
-
-export enum DeployT {
-    Prod = "production",
-    Dev = "development",
 }
     
 export const users: UserProps[] = [

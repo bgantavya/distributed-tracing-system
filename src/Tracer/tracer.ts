@@ -2,8 +2,14 @@ import {randomUUID} from "node:crypto";
 import { AppRequest } from "../utils/types.js";
 import type { NextFunction, Response } from "express";
 import { addTrace } from "./store.js";
+import { Paths } from "../utils/constant.js";
 
 export const traceRequest = (req: AppRequest, res: Response, next: NextFunction) => {
+	if (req.path === "/favicon.ico" || req.path.startsWith(Paths.logs.base())) {
+		next();
+		return;
+	}
+
 	const startTime = Date.now();
 	const traceId = randomUUID();
 	req.startTime = startTime;
@@ -19,6 +25,7 @@ export const traceRequest = (req: AppRequest, res: Response, next: NextFunction)
 			startTime,
 			durationMs,
 			userId: req.user?.id ?? req.authenticatedUser?.id,
+			ip: req.ip,
 		});
 	});
     
