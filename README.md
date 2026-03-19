@@ -1,6 +1,6 @@
 # My Project
 
-This project appears to be a TypeScript-based application, potentially focused on tracing, observability, or a system with distinct layers for data handling, restriction, and user interface. The `Tracer` module suggests a core functionality for monitoring or tracking operations.
+This project is a TypeScript-based application, focused on tracing, observability, or a system with distinct layers for data handling, restriction, and user interface. The `Tracer` module is a core functionality for monitoring or tracking operations.
 
 ## Folder Structure
 

@@ -71,3 +71,15 @@ export const showStatus = (req: AppRequest, res: Response) => {
 export const notFound = (req: AppRequest, res: Response) => {
     res.status(404).send('Nothing here')
 };
+
+export const showTest = (req: AppRequest, res: Response) => {
+    res.json({
+			method: req.method,
+			path: req.originalUrl,
+			statusCode: res.statusCode,
+			startTime:req.startTime,
+			durationMs:(Date.now() - req.startTime!),
+			userId: req.user?.id ?? req.authenticatedUser?.id,
+			ip: req.ip,
+    })
+}

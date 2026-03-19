@@ -1,5 +1,4 @@
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
-import { DeployT } from "../utils/constant.js";
 import { Trace } from "../utils/types.js";
 
 let mongoClientPromise: Promise<MongoClient> | null = null;
@@ -68,9 +67,8 @@ export const getTraces = async () => {
 };
 
 export const addTrace = (trace: Trace) => {
-    if (process.env.NODE_ENV !== DeployT.Dev) {
-        console.log(trace);
+    if (process.env.NODE_ENV !== 'prod') {
+    console.log(trace);
     } 
     void addToMemory(trace);
 };
-

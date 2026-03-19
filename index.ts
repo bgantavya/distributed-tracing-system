@@ -1,11 +1,10 @@
-'use strict'
 import express, { json } from 'express';
 import { config } from 'dotenv';
-import { loadDo, loadStats, loadUser } from './src/loaders.js'
+import { loadDo, loadUser } from './src/loaders.js'
 import { andRestrictTo, andRestrictToSelf, authenticate } from './src/restrict.js';
 import { traceRequest } from './src/Tracer/tracer.js';
-import { deleteUser, editUser, notFound, showDelay, showLogs, showStatus, showUser } from './src/views.js';
-import { Roles, DeployT, Paths } from './src/utils/constant.js';
+import { deleteUser, editUser, notFound, showDelay, showLogs, showStatus, showTest, showUser } from './src/views.js';
+import { Roles, Paths } from './src/utils/constant.js';
 
 config();
 
@@ -28,17 +27,20 @@ app.get(Paths.user.base(), loadUser, showUser);
 app.post(Paths.user.edit(), loadUser, andRestrictToSelf, editUser);
 app.delete(Paths.user.base(), loadUser, andRestrictTo(Roles.Admin), deleteUser);
 
+app.all(Paths.test(), showTest)
 app.all(Paths.delay(), loadDo, showDelay);
 app.all(Paths.status(), showStatus);
 
-app.get(Paths.logs.base(), loadStats, showLogs);
-app.get(Paths.logs.filtered(), loadStats, showLogs);
+app.get(Paths.logs.base(), showLogs);
+app.get(Paths.logs.filtered(), showLogs);
+
 app.use(notFound);
 
 const port = Number(process.env.PORT) || 1234;
-if (process.env.NODE_ENV !== DeployT.Dev) {
-  app.listen(port, (err) => {
-    if(!err) console.log('Server running at: ' + port);
-    else  console.log("but bhai, I tried!");
-  });
-}
+app.listen(port, (err) => {
+  if (err) {
+    console.log("but bhai, I tried!");
+    return;
+  }
+  console.log('Server running at: ' + port);
+});
