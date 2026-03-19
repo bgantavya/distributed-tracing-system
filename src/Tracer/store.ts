@@ -1,5 +1,6 @@
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
 import { Trace } from "../utils/types.js";
+import policy from "../../tracing-policy.json";
 
 let mongoClientPromise: Promise<MongoClient> | null = null;
 let mongoCollectionPromise: Promise<Collection<Trace> | null> | null = null;
@@ -23,7 +24,7 @@ const getMongoCollection = async (): Promise<Collection<Trace> | null> => {
             }
 
             const client = await mongoClientPromise;
-            return client.db('dts').collection<Trace>('traces');
+            return client.db(policy.projectName).collection<Trace>(policy.branchName);
         })().catch((error) => {
             console.error("Unable to connect to MongoDB", error);
             mongoClientPromise = null;
@@ -33,19 +34,6 @@ const getMongoCollection = async (): Promise<Collection<Trace> | null> => {
     }
 
     return mongoCollectionPromise;
-};
-
-const addToMemory = async (trace: Trace) => {
-    const collection = await getMongoCollection();
-    if (!collection) {
-        return;
-    }
-
-    try {
-        await collection.insertOne(trace);
-    } catch (error) {
-        console.error("Unable to persist trace to MongoDB", error);
-    }
 };
 
 export const getTraces = async () => {
@@ -66,9 +54,18 @@ export const getTraces = async () => {
     }
 };
 
-export const addTrace = (trace: Trace) => {
-    if (process.env.NODE_ENV !== 'prod') {
-    console.log(trace);
-    } 
-    void addToMemory(trace);
+export const addTrace = async (trace: Trace) => {
+    const collection = await getMongoCollection();
+    if (process.env.NODE_ENV !== 'prod') console.log(trace);
+    if (!collection) return;
+
+    const isSlow = trace.durationMs > policy.captureSlow;
+    const isErr = trace.statusCode >= 400
+    if( isSlow || isErr){
+        try {
+            await collection.insertOne(trace);
+        } catch (error) {
+            console.error("Unable to persist trace to MongoDB", error);
+        }
+    }
 };

@@ -78,7 +78,7 @@ export const showTest = (req: AppRequest, res: Response) => {
 			path: req.originalUrl,
 			statusCode: res.statusCode,
 			startTime:req.startTime,
-			durationMs:(Date.now() - req.startTime!),
+			durationMs:Date.now() - req.startTime!,
 			userId: req.user?.id ?? req.authenticatedUser?.id,
 			ip: req.ip,
     })
