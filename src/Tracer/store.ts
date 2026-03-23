@@ -1,6 +1,6 @@
 import { Collection, MongoClient, ServerApiVersion } from "mongodb";
 import { Trace } from "../utils/types.js";
-import policy from "../../tracing-policy.json";
+import policy from "../../tracing-policy.json" with { type: "json" };
 
 let mongoClientPromise: Promise<MongoClient> | null = null;
 let mongoCollectionPromise: Promise<Collection<Trace> | null> | null = null;
@@ -20,6 +20,8 @@ const getMongoCollection = async (): Promise<Collection<Trace> | null> => {
                         strict: true,
                         deprecationErrors: true,
                     },
+                    serverSelectionTimeoutMS: 5000,
+                    connectTimeoutMS: 30000,
                 });
             }
 
@@ -59,8 +61,10 @@ export const addTrace = async (trace: Trace) => {
     if (process.env.NODE_ENV !== 'prod') console.log(trace);
     if (!collection) return;
 
+    const isCode = policy.captureCodes;
     const isSlow = trace.durationMs > policy.captureSlow;
-    const isErr = trace.statusCode >= 400
+    const isErr = isCode.includes(+trace.statusCode.toString().charAt(0))
+    
     if( isSlow || isErr){
         try {
             await collection.insertOne(trace);
