@@ -1,38 +1,29 @@
 {
-  "name": "dts",
+  "name": "Distributed Tracing System",
   "version": "1.0.0",
   "description": "Distributed Tracing System to track and log issues with backend and APIs",
   "keywords": [
-    "cloud",
-    "nodemon",
-    "node",
-    "track",
-    "log",
-    "status",
-    "codes",
-    "trace",
-    "span",
-    "architect",
-    "backend"
+    "tracing",
+    "logging",
+    "backend",
+    "express"
   ],
-  "homepage": "https://github.com/bgantavya/distributed-tracing-system#readme",
-  "bugs": {
-    "url": "https://github.com/bgantavya/distributed-tracing-system/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bgantavya/distributed-tracing-system.git"
-  },
-  "license": "ISC",
+  "repository": "github.com/bgantavya/distributed-tracing-system",
+  "license": "MIT",
   "author": "Gantavya Bansal",
-  "type": "commonjs",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/index.ts",
   "scripts": {
-    "serve": "node index.js",
-    "test": "nodemon index.js"
+    "serve": "tsx index.ts",
+    "test": "tsx --test"
   },
   "dependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "nodemon": "^3.1.11"
+    "mongodb": "^7.1.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

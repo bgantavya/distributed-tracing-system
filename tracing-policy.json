@@ -1,0 +1,6 @@
+{
+    "projectName": "dts",
+    "branchName": "main",
+    "captureSlow": 200,
+    "captureCodes": [4, 5]
+}
