@@ -14,7 +14,7 @@ export const traceRequest = (req: AppRequest, res: Response, next: NextFunction)
 	const traceId = randomUUID();
 	req.startTime = startTime;
 	res.setHeader("X-Trace-Id", traceId);
-
+	
 	res.on("finish", () => {
 		const durationMs = Date.now() - startTime;
 		addTrace({
