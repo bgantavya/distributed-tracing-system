@@ -1,46 +1,27 @@
-import express, { json } from 'express';
+import express from 'express';
 import { config } from 'dotenv';
-import { loadDo, loadUser } from './src/loaders.js'
-import { andRestrictTo, andRestrictToSelf, authenticate } from './src/restrict.js';
-import { traceRequest } from './src/Tracer/tracer.js';
-import { deleteUser, editUser, notFound, showDelay, showLogs, showStatus, showTest, showUser } from './src/views.js';
-import { Roles, Paths } from './src/utils/constant.js';
+import { traceRequest } from './src/tracer.js';
+import { Paths, AppRequest } from './src/utils.js';
+import { showLogs, testResults, delayRes } from './src/fns.js';
 
 config();
+const app = express();
+const PORT = Number(process.env.PORT) || 1234;
 
-export const app = express();
-// Example requests:
-//     curl http://localhost:3000/user/0
-//     curl http://localhost:3000/user/0/edit
-//     curl http://localhost:3000/user/1
-//     curl http://localhost:3000/user/1/edit (unauthorized since this is not you)
-//     curl -X DELETE http://localhost:3000/user/0 (unauthorized since you are not an admin)
-
-// Interceptor middleware
-app.use(json({ limit: '1mb' }));
 app.use(traceRequest);
-app.use(authenticate);
+app.get('/', (req, res) => res.send('Server is Working!'));
 
-app.get('/', (req, res) => res.redirect('/user/0'));
+app.all(Paths.test(), testResults)
+app.all(Paths.delay(), delayRes,(req: AppRequest, res)=> res.send('Response delayed by seconds: ' + req.params.t));
+app.all(Paths.status(), (req: AppRequest, res) => res.status(+req.params.code).send('Status set to ' + req.params.code));
 
-app.get(Paths.user.base(), loadUser, showUser);
-app.post(Paths.user.edit(), loadUser, andRestrictToSelf, editUser);
-app.delete(Paths.user.base(), loadUser, andRestrictTo(Roles.Admin), deleteUser);
+app.get(Paths.logs(), showLogs);
+app.use((req, res) => res.status(404).send('Nothing here'));
 
-app.all(Paths.test(), showTest)
-app.all(Paths.delay(), loadDo, showDelay);
-app.all(Paths.status(), showStatus);
-
-app.get(Paths.logs.base(), showLogs);
-app.get(Paths.logs.filtered(), showLogs);
-
-app.use(notFound);
-
-const port = Number(process.env.PORT) || 1234;
-app.listen(port, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     console.log("but bhai, I tried!");
     return;
   }
-  console.log('Server running at: ' + port);
+  console.log('Server running at: ' + PORT);
 });

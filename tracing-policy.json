@@ -1,6 +1,6 @@
 {
     "projectName": "dts",
-    "branchName": "dev",
-    "captureSlow": 0,
-    "captureCodes": [1, 2, 3, 4, 5]
+    "branchName": "test",
+    "captureSlow": 200,
+    "captureCodes": [4, 5]
 }
