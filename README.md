@@ -1,70 +1,99 @@
-# My Project
+# dts-tracer
 
-This project is a TypeScript-based application, focused on tracing, observability, or a system with distinct layers for data handling, restriction, and user interface. The `Tracer` module is a core functionality for monitoring or tracking operations.
+Minimal tracing middleware for Express.
 
-## Folder Structure
+Captures request traces based on policy rules (slow requests and/or status code class), exposes in-memory logs, and lets you persist logs via callback.
 
-```
-.
-├── src
-│   ├── Tracer
-│   │   ├── store.ts
-│   │   └── tracer.ts
-│   ├── loaders.ts
-│   ├── restrict.ts
-│   └── views.ts
-├── architechture
-└── index.ts
+## Install
+
+```bash
+npm install dts-tracer
 ```
 
-## Description
+## Basic Usage
 
-My Project provides a foundational structure for an application that incorporates a tracing mechanism. It is designed with modularity in mind, separating concerns such as data loading, access restriction, and view rendering. The core `Tracer` component aims to capture and manage operational data, which can be visualized or analyzed through the `views` module.
+```ts
+import express from "express";
+import { createTraceRequest, getTraceLogs } from "dts-tracer";
 
-## How to Use
+const app = express();
 
-*(Note: Specific usage instructions are not available without code. The following are general steps for a TypeScript project.)*
+app.use(createTraceRequest());
 
-To set up and run this project:
+app.get("/logs", (_req, res) => {
+  res.json(getTraceLogs());
+});
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository-url>
-    cd <project-folder>
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or yarn install
-    ```
-3.  **Build the project:**
-    ```bash
-    npm run build
-    # or yarn build
-    ```
-4.  **Run the application:**
-    ```bash
-    npm start
-    # or yarn start
-    ```
+app.listen(3000);
+```
 
-Consult specific internal documentation or code comments within `index.ts` for detailed application entry points and configuration.
+## Create your own policy (inline)
 
-#### `src/Tracer`
+Use a custom policy object when your app needs different thresholds.
 
-This directory encapsulates the tracing functionality of the application.
-*   `tracer.ts`: Implements the core tracing logic, including instrumentation, event capturing, and potentially custom trace generation.
-*   `store.ts`: Manages the storage and retrieval of trace data, abstracting the underlying data persistence mechanism.
+```ts
+import express from "express";
+import { createTraceRequest } from "dts-tracer";
 
-## Known Issues / Improvements
+const app = express();
 
-*   **Detailed Documentation:** Enhance specific module-level documentation and API references.
-*   **Testing:** Implement comprehensive unit and integration tests for all components.
-*   **Error Handling:** Improve robustness with more sophisticated error handling mechanisms across modules.
-*   **Configuration:** Externalize more configuration options for easier deployment and customization.
+app.use(
+	createTraceRequest({
+		policy: {
+			captureSlow: 300,
+			captureCodes: [4, 5]
+		},
+		onTrace: (trace) => {
+			console.log(trace); // persist to DB/file here
+		}
+	})
+);
+```
 
-## Additional Notes or References
+## Create your own policy (from file)
 
-*   **Architecture Documentation:** For a detailed understanding of the system's design, refer to the documents within the directory.
-*   **Authors:** Gantavya Bansal
-*   **License:** This project is currently without an explicit license. Please contact the authors for licensing information.
+```ts
+import policy from "./my-tracing-policy.json" assert { type: "json" };
+import { createTraceRequest } from "dts-tracer";
+
+app.use(createTraceRequest({ policy }));
+```
+
+Example `my-tracing-policy.json`:
+
+```json
+{
+	"captureSlow": 250,
+	"captureCodes": [4, 5]
+}
+```
+
+## API
+
+- `createTraceRequest(options)`: create middleware with custom options.
+- `getTraceLogs()`: get a copy of in-memory logs.
+- `clearTraceLogs()`: clear in-memory logs.
+- `getDefaultTracePolicy()`: get package default policy.
+
+### Options
+
+- `onTrace?: (trace) => void`
+- `saveToMemory?: boolean` (default: `true`)
+- `maxLogs?: number` (default: `1000`)
+- `policy?: { captureSlow?: number; captureCodes?: number[] }`
+
+### Trace object
+
+Each trace includes:
+
+- `id`, `method`, `path`, `statusCode`, `startTime`, `durationMs`
+- optional `ip`, `userAgent`, `userId`
+
+## Policy meaning
+
+- `captureSlow`: capture request if duration is greater than this value (ms)
+- `captureCodes`: capture request if response status class matches (`1` for 1xx, `2` for 2xx, ... `5` for 5xx)
+
+## License
+
+MIT

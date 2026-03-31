@@ -4,10 +4,14 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "outDir": "dist",
+    "rootDir": ".",
     "strict": true,
     "lib": ["ESNext"],
     "esModuleInterop": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["index.ts", "src/**/*.ts", "tracing-policy.json"]
 }

@@ -1,28 +1,42 @@
 {
-  "name": "Distributed Tracing System",
+  "name": "dts-tracer",
   "version": "1.0.0",
-  "description": "Distributed Tracing System to track and log issues with backend and APIs",
+  "description": "Distributed tracing middleware for Express",
   "keywords": [
     "tracing",
     "logging",
-    "backend",
+    "middleware",
     "express"
   ],
-  "repository": "github.com/bgantavya/distributed-tracing-system",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bgantavya/distributed-tracing-system.git"
+  },
   "license": "MIT",
   "author": "Gantavya Bansal",
   "type": "module",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "serve": "tsx index.ts",
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build",
     "test": "tsx --test"
   },
   "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "mongodb": "^7.1.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
