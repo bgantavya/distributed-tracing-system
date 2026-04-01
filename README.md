@@ -1,4 +1,5 @@
-# dts-tracer
+# dts-tracer &middot; ![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg) [![npm version](https://img.shields.io/npm/v/dts-tracer.svg?style=flat)](https://www.npmjs.com/package/dts-tracer) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
 
 Minimal tracing middleware for Express.
 
