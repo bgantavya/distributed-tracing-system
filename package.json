@@ -1,43 +1,47 @@
 {
-  "name": "dts-tracer",
+  "name": "distributed-tracing-ui",
   "version": "1.0.0",
-  "description": "Distributed tracing middleware for Express",
-  "keywords": [
-    "tracing",
-    "logging",
-    "middleware",
-    "express"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bgantavya/distributed-tracing-system.git"
-  },
-  "license": "MIT",
-  "author": "Gantavya Bansal",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "prepublishOnly": "npm run build",
-    "test": "tsx --test"
+    "dev": "concurrently \"nodemon server.js\" \"vite\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@react-three/rapier": "^0.15.1",
+    "axios": "^1.13.6",
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.1",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "http-proxy-middleware": "^3.0.5",
+    "jsonwebtoken": "^9.0.3",
+    "meshline": "^3.3.1",
+    "mongoose": "^9.4.1",
+    "ogl": "^1.0.11",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.6.0",
+    "react-is": "^19.2.4",
+    "react-router-dom": "^7.1.3",
+    "recharts": "^3.8.1",
+    "three": "^0.183.2",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.5.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.14",
+    "vite": "^6.0.7"
   }
 }
