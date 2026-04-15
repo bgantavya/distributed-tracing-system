@@ -37,6 +37,18 @@ const stateClassForStatus = (status) => {
   return 'state-good';
 };
 
+const isNetworkError = (error) => {
+  const message = String(error?.message || error || '').toLowerCase();
+  return message.includes('failed to fetch') || message.includes('networkerror') || message.includes('network error');
+};
+
+const toUserError = (error, baseUrl) => {
+  if (isNetworkError(error)) {
+    return `Unable to reach ${baseUrl}. If this works locally but fails on GitHub Pages, enable CORS on the backend for origin https://bgantavya.github.io (or specific repo pages URL).`;
+  }
+  return String(error?.message || error);
+};
+
 const proxyRequest = async ({ baseUrl, method, path, body }) => {
   const response = await fetch('/api/proxy', {
     method: 'POST',
@@ -52,6 +64,38 @@ const proxyRequest = async ({ baseUrl, method, path, body }) => {
   }
 
   return payload;
+};
+
+const directRequest = async ({ baseUrl, method, path, body }) => {
+  const response = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  const contentType = response.headers.get('content-type') || '';
+  const responseBody = contentType.includes('application/json') ? await response.json() : await response.text();
+
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    traceId: response.headers.get('x-trace-id'),
+    body: responseBody,
+  };
+};
+
+const requestBackend = async (request) => {
+  if (import.meta.env.PROD) {
+    return directRequest(request);
+  }
+
+  try {
+    return await proxyRequest(request);
+  } catch {
+    return directRequest(request);
+  }
 };
 
 function Metric({ label, value }) {
@@ -159,10 +203,10 @@ export default function App() {
 
     setDashboard((current) => ({ ...current, loading: true, error: '' }));
     try {
-      const payload = await proxyRequest({ baseUrl: url, method: 'GET', path: '/logs' });
+      const payload = await requestBackend({ baseUrl: url, method: 'GET', path: '/logs' });
       setDashboard({ loading: false, error: '', traces: resolveTraces(payload?.body ?? payload) });
     } catch (error) {
-      setDashboard({ loading: false, error: String(error), traces: [] });
+      setDashboard({ loading: false, error: toUserError(error, url), traces: [] });
     }
   };
 
@@ -198,31 +242,12 @@ export default function App() {
         requestBody = JSON.parse(draft.body);
       }
 
-      let payload;
-      try {
-        payload = await proxyRequest({
-          baseUrl,
-          method,
-          path,
-          body: requestBody,
-        });
-      } catch {
-        const response = await fetch(`${baseUrl}${path}`, {
-          method,
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: requestBody !== undefined ? JSON.stringify(requestBody) : undefined,
-        });
-        const contentType = response.headers.get('content-type') || '';
-        const directBody = contentType.includes('application/json') ? await response.json() : await response.text();
-        payload = {
-          status: response.status,
-          statusText: response.statusText,
-          traceId: response.headers.get('x-trace-id'),
-          body: directBody,
-        };
-      }
+      const payload = await requestBackend({
+        baseUrl,
+        method,
+        path,
+        body: requestBody,
+      });
 
       const status = Number(payload?.status || 500);
       const statusText = payload?.statusText || '';
@@ -242,7 +267,7 @@ export default function App() {
         status: 'Network Error',
         traceId: '-',
         layer: 'Transport Layer Failure',
-        body: String(error),
+        body: toUserError(error, baseUrl),
       });
       setRequestState('error');
     }

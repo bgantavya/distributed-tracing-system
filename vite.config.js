@@ -94,6 +94,7 @@ const dtsProxyPlugin = () => ({
 });
 
 export default defineConfig({
+  base: "/",
   plugins: [react(), dtsProxyPlugin()],
   server: {
     host: '0.0.0.0',
