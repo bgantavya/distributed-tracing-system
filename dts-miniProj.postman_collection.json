@@ -1,0 +1,390 @@
+{
+  "info": {
+    "_postman_id": "63876b2f-a56c-4983-8e5b-1c49e225fd31",
+    "name": "dts-miniProj",
+    "description": "# Express API Tracing\n\n### API Endpoints\n\nYou can use `curl` or any API client to test the endpoints.\n\n- **Redirect**:\n    \n    ``` bash\n      curl http://localhost:3000/\n    \n     ```\n    \n    (Redirects to `/user/0`)\n    \n- **Get User Details**: \\[Type: GET\\]\n    \n    ``` bash\n      curl http://localhost:3000/user/0\n    \n     ```\n    \n- **Edit User Details (Self-Authorized)**: \\[Type: POST\\]\n    \n    ``` bash\n      curl -d '' http://localhost:3000/user/0/edit\n      # Example: curl http://localhost:3000/user/1/edit (This would be unauthorized if not user 1)\n    \n     ```\n    \n- **Delete User (Admin-Authorized)**: \\[Type: DELETE\\]\n    \n    ``` bash\n      curl -X DELETE http://localhost:3000/user/0\n    \n     ```\n    \n- **Simulate Delay**: \\[Type: ALL\\]\n    \n    ``` bash\n      curl http://localhost:3000/delay/:time\n    \n     ```\n    \n- **Simulate Response**: \\[Type: ALL\\]\n    \n    ``` bash\n      curl http://localhost:3000/status/:code\n    \n     ```\n    \n- **Get Logs/Stats**: \\[Type: GET\\]\n    \n    ``` bash\n      curl http://localhost:3000/logs\n    \n     ```\n    \n- **Get Filtered Logs/Stats**: \\[Type: GET\\]\n    \n    ``` bash\n      curl http://localhost:3000/logs/:code\n    \n     ```",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34078301"
+  },
+  "item": [
+    {
+      "name": "For FE Main",
+      "item": [
+        {
+          "name": "Wake Up",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{dtsMainUrl}}/",
+              "host": [
+                "{{dtsMainUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "**Purpose**: Warm up / wake the DTS service.\n\n**Params**: None.\n\n**Example**: `GET {{dtsUrl}}/`\n\n**Purpose**: Test redirect/proxy behavior by requesting a target URL.\n\n**Params**: `url` (query, required): Absolute URL to fetch/validate.\n\n**Example**: `GET {{dtsUrl}}/test?url=https://www.google.com`\n\n**Purpose**: Simulate latency by delaying the response.\n\n**Params**: `time` (path, required): Delay duration (seconds).\n\n**Example**: `PUT {{dtsUrl}}/delay/2`\n\n**Purpose**: Force a specific HTTP status code (to test FE error-handling).\n\n**Params**: `code` (path, required): HTTP status code to return (e.g., 404, 500).\n\n`expectedStatusCode` (variable, optional): Set to assert exact status via folder tests.\n\n**Example**: `PATCH {{dtsUrl}}/status/404`"
+          },
+          "response": []
+        },
+        {
+          "name": "Test URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{dtsMainUrl}}/test?url=https://www.google.com",
+              "host": [
+                "{{dtsMainUrl}}"
+              ],
+              "path": [
+                "test"
+              ],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://www.google.com",
+                  "description": "enter a url to trace it"
+                }
+              ]
+            },
+            "description": "**Purpose**: Test redirect/proxy behavior by requesting a target URL.\n\n**Params**:\n\n- `url` (query, required): Absolute URL to fetch/validate.\n    \n\n**Example**:  \n`GET {{dtsUrl}}/test?url=https://www.google.com`"
+          },
+          "response": []
+        },
+        {
+          "name": "Delay Response",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{dtsMainUrl}}/delay/:time",
+              "host": [
+                "{{dtsMainUrl}}"
+              ],
+              "path": [
+                "delay",
+                ":time"
+              ],
+              "variable": [
+                {
+                  "key": "time",
+                  "value": "2",
+                  "description": "enter in seconds"
+                }
+              ]
+            },
+            "description": "**Purpose**: Simulate latency by delaying the response.\n\n**Params**:\n\n- `time` (path, required): Delay duration (seconds).\n    \n\n**Example**:  \n`PUT {{dtsUrl}}/delay/2`"
+          },
+          "response": []
+        },
+        {
+          "name": "Set Status Code",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{dtsMainUrl}}/status/:code",
+              "host": [
+                "{{dtsMainUrl}}"
+              ],
+              "path": [
+                "status",
+                ":code"
+              ],
+              "variable": [
+                {
+                  "key": "code",
+                  "value": "420",
+                  "description": "1XX-5XX enter any value"
+                }
+              ]
+            },
+            "description": "**Purpose**: Force a specific HTTP status code (to test FE error-handling).\n\n**Params**:\n\n- `code` (path, required): HTTP status code to return (e.g., 404, 500).\n    \n- `expectedStatusCode` (variable, optional): Set to assert exact status via folder tests.\n    \n\n**Example**:  \n`PATCH {{dtsUrl}}/status/404`"
+          },
+          "response": []
+        },
+        {
+          "name": "Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{dtsMainUrl}}/logs",
+              "host": [
+                "{{dtsMainUrl}}"
+              ],
+              "path": [
+                "logs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Purpose\n\nUtilities used during frontend development to quickly wake the server, validate redirects, simulate latency, and force specific HTTP status codes.\n\n## Required variable\n\n- `{{dtsUrl}}` _(global/environment variable)_: Base URL for the DTS service.\n    \n\nExample:\n\n``` text\n{{dtsUrl}} = https://your-host.example.com\n\n ```\n\n## Typical workflow\n\n1. **Wake Up**: hit the root endpoint to warm up the server.\n    \n2. **Test**: verify a redirect / proxy behavior using `url` query param.\n    \n3. **Delay**: simulate slow responses by delaying for N seconds.\n    \n4. **Set Status Code**: force a specific HTTP status to validate FE error-handling.\n    \n\n> Tip: keep `{{dtsUrl}}` pointing to the environment you’re currently developing against (local/dev/staging).",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Redirect root",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dtsDevUrl}}/",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        },
+        "description": "Generated from cURL: curl --location '{{dtsUrl}}/'"
+      },
+      "response": []
+    },
+    {
+      "name": "Get user details (GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dtsDevUrl}}/user/:id",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "user",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "0"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location '{{dtsUrl}}/user/:id'"
+      },
+      "response": []
+    },
+    {
+      "name": "Edit user details (self)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{dtsDevUrl}}/user/:id/edit",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "user",
+            ":id",
+            "edit"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request POST '{{dtsUrl}}/user/:id/edit' \\\n--header 'Content-Type: application/json' \\\n--data '{}'\n"
+      },
+      "response": []
+    },
+    {
+      "name": "Delete user (admin)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{dtsDevUrl}}/user/:id",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "user",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "2"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location --request DELETE '{{dtsUrl}}/user/:id'"
+      },
+      "response": []
+    },
+    {
+      "name": "Simulate delay",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{dtsDevUrl}}/delay/:time",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "delay",
+            ":time"
+          ],
+          "variable": [
+            {
+              "key": "time",
+              "value": "1",
+              "description": "s"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location '{{dtsUrl}}/delay/:time'"
+      },
+      "response": []
+    },
+    {
+      "name": "Simulate response status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{dtsDevUrl}}/status/:code",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "status",
+            ":code"
+          ],
+          "variable": [
+            {
+              "key": "code",
+              "value": "412",
+              "description": "1XX-5XX"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location '{{dtsUrl}}/status/:code'"
+      },
+      "response": []
+    },
+    {
+      "name": "Get logs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dtsDevUrl}}/logs",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "logs"
+          ]
+        },
+        "description": "Generated from cURL: curl --location '{{dtsUrl}}/logs'"
+      },
+      "response": []
+    },
+    {
+      "name": "Get filtered logs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{ }}/logs/:code",
+          "host": [
+            "{{dtsDevUrl}}"
+          ],
+          "path": [
+            "logs",
+            ":code"
+          ],
+          "variable": [
+            {
+              "key": "code",
+              "value": "200",
+              "description": "1XX-5XX"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl --location '{{dtsUrl}}/logs/:code'"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "dtsDevUrl",
+      "value": "https://distributed-tracing-system.onrender.com"
+    },
+    {
+      "key": "dtsMainUrl",
+      "value": "https://distributed-tracing-system.vercel.app/"
+    }
+  ]
+}
