@@ -84,7 +84,7 @@ Example `my-tracing-policy.json`:
 - `policy?: { captureSlow?: number; captureCodes?: number[] }`
 
 ### Trace object
-
+        
 Each trace includes:
 
 - `id`, `method`, `path`, `statusCode`, `startTime`, `durationMs`
